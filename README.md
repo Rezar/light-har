@@ -2,5 +2,12 @@
 
 ## Document action_identity
 
+
 ### Description
-Contains two main functions: get accelerometer data on apple watch **(haven't been tested)**, use gru to predict activity behavior **(tested and available)**
+Contains two main functions: get accelerometer data on apple watch **(haven't been tested)**, use **GRU** to predict activity behavior **(tested and available)**
+
+
+### Models
+Under the premise of controlling the adjustable parameters, the performance of **five models (CNN, TensorFlow, GRU, LSTM, TensorFlow+CNN)** on the same data set was tested.
+
+Combining several indicators such as accuracy and using time **(ExperimentalRecord.xlsx)**, **the GRU model has the best score**. Therefore, in the implementation of watchOS app, we choose to embed the GRU model.
