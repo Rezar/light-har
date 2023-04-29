@@ -28,14 +28,14 @@ func predict(x: Double, y: Double, z: Double) -> String
 #### iOS
 1. Import the coreML model in the `iosApp` folder
 2. Call the `predict` function in the `ContentView.swift` file
-<p align="center">
+<p align="left">
 <img alt="Multi platform" src="resources/ui_ml_ios.png" width="400"/>
 </p>
 
 #### Android
 1. Import the PyTorch model in the `androidApp` folder
 2. Call the `predict` function in the `MainActivity.kt` file
-<p align="center">
+<p align="left">
 <img alt="Multi platform" src="resources/ui_ml_android.png" width="400"/>
 </p>
 
