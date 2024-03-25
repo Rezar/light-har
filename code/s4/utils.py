@@ -1,7 +1,11 @@
+import time
+import os
+import psutil
 import torch
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import accuracy_score
+import pathlib
 
 
 # Validate the model given the dataloader and return loss and accuracy
@@ -30,19 +34,24 @@ def validate(model, dataloader, device):
     return avg_loss, accuracy
 
 # Plot training history and save figures
+
+
 def plot_or_save_metrics(num_epochs, train_losses, val_losses, val_accuracies, save_path=None, show_plot=True):
     epochs = range(1, num_epochs + 1)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
 
-    ax1.plot(epochs, train_losses, label='Training Loss', marker='o', color='blue')
-    ax1.plot(epochs, val_losses, label='Validation Loss', marker='o', color='red')
+    ax1.plot(epochs, train_losses, label='Training Loss',
+             marker='o', color='blue')
+    ax1.plot(epochs, val_losses, label='Validation Loss',
+             marker='o', color='red')
     ax1.set_title('Training and Validation Losses')
     ax1.set_xlabel('Epochs')
     ax1.set_ylabel('Loss')
     ax1.legend()
     ax1.grid(True)
 
-    ax2.plot(epochs, val_accuracies, label='Validation Accuracy', marker='o', color='green')
+    ax2.plot(epochs, val_accuracies, label='Validation Accuracy',
+             marker='o', color='green')
     ax2.set_title('Validation Accuracy')
     ax2.set_xlabel('Epochs')
     ax2.set_ylabel('Accuracy')
@@ -65,7 +74,7 @@ def train(model, train_loader, test_loader, save_path=None, num_epochs=1, device
     optimizer = torch.optim.Adam(model.parameters())
     loss_fn = torch.nn.CrossEntropyLoss()
 
-    best_val_accuracy = 0.0 
+    best_val_accuracy = 0.0
     best_model_state = None
 
     train_losses = []
@@ -99,22 +108,23 @@ def train(model, train_loader, test_loader, save_path=None, num_epochs=1, device
             best_val_accuracy = val_acc
             best_model_state = model.state_dict()
 
-        if verbose>0:
-            print(f"Epoch [{epoch+1}/{num_epochs}], Train Loss: {avg_loss:.4f}, Val Accuracy: {val_acc:.2f}%")
+        if verbose > 0:
+            print(
+                f"Epoch [{epoch+1}/{num_epochs}], Train Loss: {avg_loss:.4f}, Val Accuracy: {val_acc:.2f}%")
 
-    if verbose>0:
+    if verbose > 0:
         print('Finished training')
 
     if val_acc < best_val_accuracy:
         model.load_state_dict(best_model_state)
 
-        if verbose>0:
+        if verbose > 0:
             print('Best model state restored')
 
     # Save the best model
     if save_path:
         torch.save(model.state_dict(), save_path+".pt")
-        if verbose>0:
+        if verbose > 0:
             print(f'Best model saved at {save_path}.pt')
 
     # Save the training history
@@ -127,9 +137,10 @@ def train(model, train_loader, test_loader, save_path=None, num_epochs=1, device
 
     if save_path:
         history_df.to_csv(save_path+".csv", index=False)
-        if verbose>0:
+        if verbose > 0:
             print(f'Training history saved at {save_path}.csv')
     return train_losses, val_losses, val_accuracies
+
 
 def load_and_plot_history(load_path):
     # Load the DataFrame from the CSV file
@@ -142,4 +153,37 @@ def load_and_plot_history(load_path):
     val_accuracies = history_df['val_accuracy'].tolist()
 
     # Plot the history
-    plot_or_save_metrics(len(epochs), train_losses, val_losses, val_accuracies, save_path=None)
+    plot_or_save_metrics(len(epochs), train_losses,
+                         val_losses, val_accuracies, save_path=None)
+
+
+def measure_size(model: torch.nn.Module):
+    temp_path = "./temp_state_dict.pt"
+    torch.save(model.state_dict(), temp_path)
+    model_path = pathlib.Path(temp_path)
+    model_size_bytes = model_path.stat().st_size
+    model_size_kb = model_size_bytes / 1024
+    os.remove(temp_path)
+
+    return model_size_kb
+
+
+def run_measurements(model: torch.nn.Module, dataloader, device) -> None:
+    # CPU utilization and Inference time
+    cpu_percent_before = psutil.cpu_percent(interval=None)
+    start_time = time.time()
+    _, acc = validate(model, dataloader, device)
+    end_time = time.time()
+    cpu_percent_after = psutil.cpu_percent(interval=None)
+
+    # Calculations
+    elapsed_time = end_time - start_time
+    average_cpu_utilization = (cpu_percent_before + cpu_percent_after) / 2
+
+    # Measure model size
+    size_kb = measure_size(model)
+
+    print(f"Accuracy on the test set: {acc:.2f} %")
+    print(f"Size of the model: {size_kb:.2f} KB")
+    print(f"Total inference time: {elapsed_time:.2f} seconds")
+    print(f"CPU Utilization: {average_cpu_utilization:.2f} %")
