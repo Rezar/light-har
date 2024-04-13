@@ -1,18 +1,16 @@
-"""Minimal version of S4D with extra options and features stripped out, for pedagogical purposes."""
+"""
+This file contains the Static Quantization of S4
+"""
 
 import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from myeinops.einops import rearrange, repeat
-
-from typing import Union, List
-import torch
-from torch import Tensor
+from einops import rearrange, repeat
 
 class S4DKernel(nn.Module):
     """Generate convolution kernel from diagonal SSM parameters."""
-
+    
     def __init__(self, d_model, N=64, dt_min=0.001, dt_max=0.1, lr=None):
         super().__init__()
         # Generate dt
@@ -26,27 +24,17 @@ class S4DKernel(nn.Module):
         self.register("log_dt", log_dt, lr)
 
         log_A_real = torch.log(0.5 * torch.ones(H, N//2))
-        A_imag = math.pi * repeat(torch.arange(N//2), pattern='n -> h n', h=H)
+        A_imag = math.pi * repeat(torch.arange(N//2), 'n -> h n', h=H)
         self.register("log_A_real", log_A_real, lr)
         self.register("A_imag", A_imag, lr)
 
-    def forward(self, u: Tensor):
+    def forward(self, L):
         """
         returns: (..., c, L) where c is number of channels (default 1)
         """
-        
-        L = u.size(-1)
-
         # Materialize parameters
         dt = torch.exp(self.log_dt) # (H)
-        
-        # C = torch.view_as_complex(self.C) # (H N)
-        
-        # modified to avoid using torch.view_as_complex()
-        C_real = self.C[..., 0]  # Extract the real part
-        C_imag = self.C[..., 1]  # Extract the imaginary part
-        C = torch.complex(C_real, C_imag)  # Construct complex numbers
-
+        C = torch.view_as_complex(self.C) # (H N)
         A = -torch.exp(self.log_A_real) + 1j * self.A_imag # (H N)
 
         # Vandermonde multiplication
@@ -86,7 +74,7 @@ class S4D(nn.Module):
 
         # Pointwise
         self.activation = nn.GELU()
-        dropout_fn = nn.Dropout2d # NOTE: bugged in PyTorch 1.11
+        # dropout_fn = nn.Dropout2d # NOTE: bugged in PyTorch 1.11
         dropout_fn = DropoutNd
         self.dropout = dropout_fn(dropout) if dropout > 0.0 else nn.Identity()
 
@@ -95,15 +83,22 @@ class S4D(nn.Module):
             nn.Conv1d(self.h, 2*self.h, kernel_size=1),
             nn.GLU(dim=-2),
         )
+        
+        self.quant = torch.quantization.QuantStub()
+        self.dequant = torch.quantization.DeQuantStub()
 
-    def forward(self, u: Tensor): # absorbs return_output and transformer src mask
+    def forward(self, u, **kwargs): # absorbs return_output and transformer src mask
         """ Input and output shape (B, H, L) """
         if not self.transposed: u = u.transpose(-1, -2)
         L = u.size(-1)
-        
-        # Compute SSM Kernel
-        k = self.kernel(u) # (H L)
 
+        # Compute SSM Kernel
+        k = self.kernel(L=L) # (H L)
+        
+        # Dequantize prior to the FFT operations
+        u = self.dequant(u)
+        k = self.dequant(k)
+        
         # Convolution
         k_f = torch.fft.rfft(k, n=2*L) # (H L)
         u_f = torch.fft.rfft(u, n=2*L) # (B H L)
@@ -111,12 +106,23 @@ class S4D(nn.Module):
 
         # Compute D term in state space equation - essentially a skip connection
         y = y + u * self.D.unsqueeze(-1)
-
-        y = self.dropout(self.activation(y))
-        y = self.output_linear(y)
+        
+        y = self.activation(y)
+        y = self.dropout(y)
+        
+        # Quantize again for conv1d layer
+        y = self.quant(y)
+        y = self.output_linear[0](y)
+        
+        # Dequantize y for the GLU layer
+        y = self.dequant(y)
+        y = self.output_linear[1](y)
+        
+        # Quantize y eventually
+        y = self.quant(y)
+        
         if not self.transposed: y = y.transpose(-1, -2)
         return y, None # Return a dummy state to satisfy this repo's interface, but this can be modified
-
 
 class DropoutNd(nn.Module):
     def __init__(self, p: float = 0.5, tie=True, transposed=True):
