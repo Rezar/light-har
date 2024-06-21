@@ -8,10 +8,12 @@
 import SwiftUI
 import CoreMotion
 import CoreML
+import MetricKit
 
 struct RunningView: View {
     var selectedModel: String
     @State private var isRunning = false
+    @State private var registerAsLoop = false
     @State private var startTime = Date()
     @State private var showLogs = false
     @State private var elapsedTime = "00:00"
@@ -20,16 +22,46 @@ struct RunningView: View {
     @State private var activity = "Unknown"
     @State private var timer: Timer? = nil
     @State private var predictionCounter = 0
-    @State private var predictionInterval = 5
+    @State private var predictionInterval = 60
     @State private var logs: [Log] = []
+    @State private var memoryUsage: String = "-- MB"
+    @State private var batteryUsage: String = "-- mAh"
+    
+    private let backgroundTaskManager = BackgroundTaskManager()
+        
     
     let motionManager = CMMotionManager()
     @State var model: MLModel?
     @State var model_output: String?
     @State var model_input: MLFeatureProvider?
+    
+    let intervals = [5, 15, 30, 60, 600]
 
     var body: some View {
         VStack {
+            HStack {
+                Text("Background as Loop:")
+                Toggle(isOn: $registerAsLoop) {
+                    Text("")
+                }
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .disabled(isRunning)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("Prediction Interval (s):")
+                Spacer()
+                Picker("", selection: $predictionInterval) {
+                    ForEach(intervals, id: \.self) { interval in
+                        Text("\(interval)").tag(interval)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .frame(maxWidth: 200)
+                .disabled(isRunning)
+            }
+            .padding(.horizontal)
+            
             HStack {
                 Text("Model: \(selectedModel)")
                     .font(.headline)
@@ -97,14 +129,14 @@ struct RunningView: View {
                     HStack {
                         Text("Memory Utilization (kB):")
                         Spacer()
-                        Text("--")
+                        Text(memoryUsage)
                     }
                     .padding(.top, 2)
                     
                     HStack {
                         Text("Battery Usage (mAh):")
                         Spacer()
-                        Text("--")
+                        Text(batteryUsage)
                     }
                     .padding(.top, 2)
                 }
@@ -135,7 +167,23 @@ struct RunningView: View {
         }
         .onAppear(perform: {
             initModel()
+            MXMetricManager.shared.add(MetricsHandler.shared)
+            MetricsHandler.shared.onMemoryUsageUpdate = { memoryUsageKB in
+                DispatchQueue.main.async {
+                    self.memoryUsage = String(format: "%.2f", memoryUsageKB)
+                }
+            }
+            MetricsHandler.shared.onBatteryUsageUpdate = { batteryUsage in
+                DispatchQueue.main.async {
+                    self.batteryUsage = String(format: "%.2f", batteryUsage)
+                }
+            }
         })
+        .onDisappear {
+            MXMetricManager.shared.remove(MetricsHandler.shared)
+            MetricsHandler.shared.onMemoryUsageUpdate = nil
+            MetricsHandler.shared.onBatteryUsageUpdate = nil
+        }
         .navigationBarBackButtonHidden(isRunning)
         .navigationTitle("Activity Detection")
         .background(
@@ -145,6 +193,7 @@ struct RunningView: View {
                 label: { EmptyView() }
             )
         )
+        
     }
 
     func initModel() {
@@ -233,6 +282,7 @@ struct RunningView: View {
     func startModel() {
         isRunning = true
         startUpdates()
+        backgroundTaskManager.registerBackgroundTask()
     }
 
     func toggleRunning() {
@@ -266,17 +316,62 @@ struct RunningView: View {
         }
     }
     
+    func simulateMetricsCollection() {
+        // Simulate updating the memory and battery usage for demonstration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.memoryUsage = "512.00" // Simulated value
+            self.batteryUsage = "120.00" // Simulated value
+        }
+    }
+    
     func stopModel() {
         isRunning = false
         motionManager.stopAccelerometerUpdates()
         timer?.invalidate()
         timer = nil
+        backgroundTaskManager.endBackgroundTask()
     }
 
     func saveLogs() {
-        //TODO: Implement log saving functionality here
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+
+        do {
+            let filename = "logs_\(selectedModel).json"
+            let data = try encoder.encode(logs)
+            if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                let fileURL = documentDirectory.appendingPathComponent(filename)
+                try data.write(to: fileURL)
+                print("Logs saved to \(fileURL)")
+                
+                saveFileToiCloudDrive(filename: filename, data: data)
+            }
+        } catch {
+            print("Failed to save logs: \(error)")
+        }
     }
 
+    func saveFileToiCloudDrive(filename: String, data: Data) {
+        // Get the URL for the iCloud Drive Documents directory
+        guard let iCloudURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") else {
+            print("iCloud Drive is not available")
+            return
+        }
+        let fileURL = iCloudURL.appendingPathComponent(filename)
+        
+        do {
+            // Ensure the directory exists
+            try FileManager.default.createDirectory(at: iCloudURL, withIntermediateDirectories: true, attributes: nil)
+            
+            // Write the file
+            try data.write(to: fileURL)
+            
+            print("File saved to iCloud Drive at \(fileURL)")
+        } catch {
+            print("Failed to save file to iCloud Drive: \(error)")
+        }
+    }
+    
     func updateReadings(with newReading: (x: Double, y: Double, z: Double)) {
         if accelerometerReadings.count >= 16 {
             accelerometerReadings.removeFirst()
@@ -366,15 +461,14 @@ struct RunningView: View {
                     }
                 }
                 
-                //print(outputArray)
                 activity = getTextPrediction(output_num: maxIndex)
                 
                 let newLog = Log(
                     timestamp: Date(),
                     activity: activity,
                     maxValue: maxValue,
-                    memoryUsage: "-- MB",
-                    batteryUsage: "-- mAh"
+                    memoryUsage: self.memoryUsage,
+                    batteryUsage: self.batteryUsage
                 )
                 logs.append(newLog)
             }
@@ -401,7 +495,9 @@ struct RunningView: View {
             return "Waiting for Identifying"
         }
     }
+    
 }
+
 
 struct RunningView_Previews: PreviewProvider {
     static var previews: some View {

@@ -17,7 +17,7 @@ class AccelerometerManager: ObservableObject {
     
     init() {
         self.motionManager = CMMotionManager()
-        self.motionManager.accelerometerUpdateInterval = 0.05  // 20 Hz
+        self.motionManager.accelerometerUpdateInterval = 0.05
         self.model = try! CNN()
         startAccelerometerUpdates()
     }
@@ -26,7 +26,7 @@ class AccelerometerManager: ObservableObject {
         motionManager.startAccelerometerUpdates(to: .main) { [weak self] (data, error) in
             guard let self = self, let data = data else { return }
             
-            // Collect data continuously but process in chunks
+            // We are collecting data continuously but process in chunks
             self.latestMeasurements.append(data.acceleration)
             if self.latestMeasurements.count >= 16 {
                 self.processData()
@@ -35,10 +35,10 @@ class AccelerometerManager: ObservableObject {
         }
     }
     
+
     private func processData() {
         guard latestMeasurements.count >= 16 else { return }
-        
-        // Prepare the input for the model
+
         do {
             let inputArray = try MLMultiArray(shape: [1, 3, 16], dataType: .float32)
             for i in 0..<16 {
@@ -46,8 +46,6 @@ class AccelerometerManager: ObservableObject {
                 inputArray[i * 3 + 1] = NSNumber(value: latestMeasurements[i].y)
                 inputArray[i * 3 + 2] = NSNumber(value: latestMeasurements[i].z)
             }
-            
-            // Make prediction
             let input = CNNInput(x: inputArray)
             let modelOutput = try model.prediction(input: input)
             DispatchQueue.main.async {
@@ -88,7 +86,7 @@ class AccelerometerManager: ObservableObject {
     func getIndexOfMaxValue(from multiArray: MLMultiArray) -> Int {
         let count = multiArray.count
         var maxIndex = -1
-//        var maxValue = multiArray[maxIndex].floatValue
+        //var maxValue = multiArray[maxIndex].floatValue
         var maxValue : Float = 0.0
 
         for i in 0..<count {

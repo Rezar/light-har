@@ -6,8 +6,8 @@
  */
 import Foundation
 
-struct Log: Identifiable {
-    let id = UUID()
+struct Log: Identifiable, Codable {
+    var id = UUID()
     let timestamp: Date
     let activity: String
     let maxValue: Float

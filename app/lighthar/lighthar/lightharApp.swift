@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct lightharApp: App {
     @StateObject private var accelerometerManager = AccelerometerManager()
-    @StateObject private var metricsManager = MetricsManager()
+    //@StateObject private var metricsManager = MetricsManager()
     
     var body: some Scene {
         WindowGroup {
