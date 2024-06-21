@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		580AF4532C1CC118000FFDE3 /* MetricsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580AF4522C1CC118000FFDE3 /* MetricsHandler.swift */; };
+		580AF4552C1CCF89000FFDE3 /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580AF4542C1CCF89000FFDE3 /* Metrics.swift */; };
 		585DCF392BDC4F7100FC5F04 /* AccelerometerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF382BDC4F7100FC5F04 /* AccelerometerManager.swift */; };
-		585DCF3C2BDC4FBD00FC5F04 /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF3B2BDC4FBD00FC5F04 /* MetricsManager.swift */; };
 		585DCF592BDC542400FC5F04 /* CNNMagnitudePruner.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF402BDC542300FC5F04 /* CNNMagnitudePruner.mlpackage */; };
 		585DCF5B2BDC542400FC5F04 /* GRU.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF412BDC542300FC5F04 /* GRU.mlpackage */; };
 		585DCF5D2BDC542400FC5F04 /* MLPMagnitudePruner.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF422BDC542300FC5F04 /* MLPMagnitudePruner.mlpackage */; };
@@ -34,6 +35,7 @@
 		585DCF852BDC542400FC5F04 /* MLPPalettizationLUT.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF562BDC542400FC5F04 /* MLPPalettizationLUT.mlpackage */; };
 		585DCF872BDC542400FC5F04 /* CNNInt8LSQuantization.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF572BDC542400FC5F04 /* CNNInt8LSQuantization.mlpackage */; };
 		585DCF892BDC542400FC5F04 /* TransformerPalettizationLUT.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 585DCF582BDC542400FC5F04 /* TransformerPalettizationLUT.mlpackage */; };
+		58B8A4EE2C260E2E0056C722 /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B8A4ED2C260E2E0056C722 /* BackgroundTaskManager.swift */; };
 		58C04B422BDC232D00BBB779 /* lightharApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C04B412BDC232D00BBB779 /* lightharApp.swift */; };
 		58C04B462BDC232E00BBB779 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58C04B452BDC232E00BBB779 /* Assets.xcassets */; };
 		58C04B492BDC232E00BBB779 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58C04B482BDC232E00BBB779 /* Preview Assets.xcassets */; };
@@ -58,8 +60,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		580AF4522C1CC118000FFDE3 /* MetricsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsHandler.swift; sourceTree = "<group>"; };
+		580AF4542C1CCF89000FFDE3 /* Metrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metrics.swift; sourceTree = "<group>"; };
 		585DCF382BDC4F7100FC5F04 /* AccelerometerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerometerManager.swift; sourceTree = "<group>"; };
-		585DCF3B2BDC4FBD00FC5F04 /* MetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsManager.swift; sourceTree = "<group>"; };
 		585DCF402BDC542300FC5F04 /* CNNMagnitudePruner.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = CNNMagnitudePruner.mlpackage; path = coreml_models/CNNMagnitudePruner.mlpackage; sourceTree = SOURCE_ROOT; };
 		585DCF412BDC542300FC5F04 /* GRU.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = GRU.mlpackage; path = coreml_models/GRU.mlpackage; sourceTree = SOURCE_ROOT; };
 		585DCF422BDC542300FC5F04 /* MLPMagnitudePruner.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = MLPMagnitudePruner.mlpackage; path = coreml_models/MLPMagnitudePruner.mlpackage; sourceTree = SOURCE_ROOT; };
@@ -85,6 +88,9 @@
 		585DCF562BDC542400FC5F04 /* MLPPalettizationLUT.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = MLPPalettizationLUT.mlpackage; path = coreml_models/MLPPalettizationLUT.mlpackage; sourceTree = SOURCE_ROOT; };
 		585DCF572BDC542400FC5F04 /* CNNInt8LSQuantization.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = CNNInt8LSQuantization.mlpackage; path = coreml_models/CNNInt8LSQuantization.mlpackage; sourceTree = SOURCE_ROOT; };
 		585DCF582BDC542400FC5F04 /* TransformerPalettizationLUT.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; name = TransformerPalettizationLUT.mlpackage; path = coreml_models/TransformerPalettizationLUT.mlpackage; sourceTree = SOURCE_ROOT; };
+		58B8A4EB2C25FB630056C722 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		58B8A4EC2C25FD030056C722 /* lighthar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lighthar.entitlements; sourceTree = "<group>"; };
+		58B8A4ED2C260E2E0056C722 /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		58C04B3E2BDC232D00BBB779 /* lighthar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = lighthar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		58C04B412BDC232D00BBB779 /* lightharApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lightharApp.swift; sourceTree = "<group>"; };
 		58C04B452BDC232E00BBB779 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -143,7 +149,8 @@
 			isa = PBXGroup;
 			children = (
 				585DCF382BDC4F7100FC5F04 /* AccelerometerManager.swift */,
-				585DCF3B2BDC4FBD00FC5F04 /* MetricsManager.swift */,
+				580AF4522C1CC118000FFDE3 /* MetricsHandler.swift */,
+				58B8A4ED2C260E2E0056C722 /* BackgroundTaskManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -167,6 +174,8 @@
 		58C04B402BDC232D00BBB779 /* lighthar */ = {
 			isa = PBXGroup;
 			children = (
+				58B8A4EC2C25FD030056C722 /* lighthar.entitlements */,
+				58B8A4EB2C25FB630056C722 /* Info.plist */,
 				585DCF3F2BDC509400FC5F04 /* Manager */,
 				585DCF3E2BDC507E00FC5F04 /* Models */,
 				58C04B412BDC232D00BBB779 /* lightharApp.swift */,
@@ -177,6 +186,7 @@
 				58C90EAA2C00FF0800198E4B /* RunningView.swift */,
 				58C90EAC2C00FF2E00198E4B /* LogsView.swift */,
 				58C90EAE2C011AE500198E4B /* Log.swift */,
+				580AF4542C1CCF89000FFDE3 /* Metrics.swift */,
 			);
 			path = lighthar;
 			sourceTree = "<group>";
@@ -270,6 +280,7 @@
 				585DCF712BDC542400FC5F04 /* MLPInt8LSQuantization.mlpackage in Sources */,
 				585DCF672BDC542400FC5F04 /* TransformerThresholdPruner.mlpackage in Sources */,
 				585DCF832BDC542400FC5F04 /* GRUPalettizationLUT.mlpackage in Sources */,
+				580AF4532C1CC118000FFDE3 /* MetricsHandler.swift in Sources */,
 				585DCF7B2BDC542400FC5F04 /* LSTMInt8LSQuantization.mlpackage in Sources */,
 				585DCF612BDC542400FC5F04 /* CNN.mlpackage in Sources */,
 				585DCF892BDC542400FC5F04 /* TransformerPalettizationLUT.mlpackage in Sources */,
@@ -284,13 +295,14 @@
 				585DCF852BDC542400FC5F04 /* MLPPalettizationLUT.mlpackage in Sources */,
 				58C90EAB2C00FF0800198E4B /* RunningView.swift in Sources */,
 				58C04B422BDC232D00BBB779 /* lightharApp.swift in Sources */,
+				58B8A4EE2C260E2E0056C722 /* BackgroundTaskManager.swift in Sources */,
 				585DCF692BDC542400FC5F04 /* MLP.mlpackage in Sources */,
 				585DCF792BDC542400FC5F04 /* GRUInt8LSQuantization.mlpackage in Sources */,
 				585DCF6D2BDC542400FC5F04 /* Transformer.mlpackage in Sources */,
 				585DCF5F2BDC542400FC5F04 /* MLPThresholdPruner.mlpackage in Sources */,
-				585DCF3C2BDC4FBD00FC5F04 /* MetricsManager.swift in Sources */,
 				585DCF632BDC542400FC5F04 /* LSTMPalettizationLUT.mlpackage in Sources */,
 				585DCF752BDC542400FC5F04 /* GRUThresholdPruner.mlpackage in Sources */,
+				580AF4552C1CCF89000FFDE3 /* Metrics.swift in Sources */,
 				58C90EA92C00FED700198E4B /* ModelSelectionViewUIView.swift in Sources */,
 				585DCF5B2BDC542400FC5F04 /* GRU.mlpackage in Sources */,
 			);
@@ -428,12 +440,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = lighthar/lighthar.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lighthar/Preview Content\"";
 				DEVELOPMENT_TEAM = 6N8H894BGC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = lighthar/Info.plist;
+				INFOPLIST_KEY_NSMotionUsageDescription = "This application needs access to the Accelerometer";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -463,12 +478,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = lighthar/lighthar.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lighthar/Preview Content\"";
 				DEVELOPMENT_TEAM = 6N8H894BGC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = lighthar/Info.plist;
+				INFOPLIST_KEY_NSMotionUsageDescription = "This application needs access to the Accelerometer";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
