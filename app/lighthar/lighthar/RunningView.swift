@@ -282,6 +282,7 @@ struct RunningView: View {
     func startModel() {
         isRunning = true
         startUpdates()
+        backgroundTaskManager.setRegisterAsLoop(value: registerAsLoop)
         backgroundTaskManager.registerBackgroundTask()
     }
 
